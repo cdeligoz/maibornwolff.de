@@ -7,11 +7,13 @@ import de.maibornwolff.utilities.Driver;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.openqa.selenium.support.ui.Select;
 
-public class BewerbungStepDefs {
-    boolean flag=false;
+public class ApplicationStepDefs {
+    private static boolean flag = false;
+    JobVacanciesPage jobVacanciesPage = new JobVacanciesPage();
+    ApplicationFormPage applicationFormPage = new ApplicationFormPage();
 
     @Given("applicant lands on the website")
     public void applicant_lands_on_the_website() {
@@ -20,102 +22,108 @@ public class BewerbungStepDefs {
 
     @When("applicant accepts cookies")
     public void applicant_accepts_cookies() {
-        new CookiesPage().cookiesZulassen.click();
+        new CookiesPage().selectElement(new CookiesPage().cookiesZulassen);
     }
 
     @When("applicant navigates to {string}, {string}")
     public void applicant_navigates_to(String tab, String module) {
-        new DashboardPage().navigateToModule(tab,module);
+        new DashboardPage().navigateToModule(tab, module);
     }
 
     @When("the applicant picks {string} from the dropdown menu")
     public void the_applicant_picks_from_the_dropdown_menu(String location) {
-        Select select = new Select(new OffeneStellenPage().desiredLocation);
+        Select select = new Select(jobVacanciesPage.desiredLocation);
         select.selectByVisibleText(location);
     }
 
     @When("the applicant clicks on the {string}, {string}")
-    public void the_applicant_clicks_on_the(String divisionName, String jobTitle)  {
-        new OffeneStellenPage().navigateToJobDescription(divisionName,jobTitle);
-
+    public void the_applicant_clicks_on_the(String divisionName, String jobTitle) {
+        jobVacanciesPage.navigateToJobDescription(divisionName, jobTitle);
     }
+
     @When("the applicant clicks on the {string}")
     public void the_applicant_clicks_on_the(String string) {
-        new JobDescriptionPage().jetztBewerbenButton.click();
+        new JobDescriptionPage().selectElement(new JobDescriptionPage().jetztBewerbenButton);
+    }
 
-    }
-    @Then("the application form should be opened")
-    public void the_application_form_should_be_opened() {
+    @Then("the application form should open")
+    public void the_application_form_should_open() {
         BrowserUtils.switchToWindow("");
-        Assert.assertEquals("",Driver.get().getTitle());
+        assertEquals("", Driver.get().getTitle());
     }
+
     @When("the applicant lands on the application form page")
     public void the_applicant_lands_on_the_application_form_page() throws InterruptedException {
         applicant_lands_on_the_website();
         applicant_accepts_cookies();
         applicant_navigates_to("Karriere", "Offene Stellen");
         the_applicant_picks_from_the_dropdown_menu("Berlin");
-        the_applicant_clicks_on_the("Software Testing","Softwaretester");
+        the_applicant_clicks_on_the("Software Testing", "Softwaretester");
         the_applicant_clicks_on_the("Jetzt bewerben");
         BrowserUtils.switchToWindow("");
     }
 
     @When("the applicant inputs its {string} , {string},{string}")
-    public void the_applicant_inputs_its(String vorname, String nachname, String email) {
-       new ApplicationFormPage().nameInputBox.sendKeys(vorname);
-        new ApplicationFormPage().surnameInputBox.sendKeys(nachname);
-        new ApplicationFormPage().emailInputBox.sendKeys(email);
-        if(new ApplicationFormPage().personalInformationCheck(vorname,nachname,email)){
-            flag=true;
+    public void the_applicant_inputs_its(String name, String lastname, String email) {
+        applicationFormPage.fillPersonalInformation(name, lastname, email);
+        if (applicationFormPage.personalInformationCheck(name, lastname, email)) {
+            flag = true;
         }
+    }
 
+    @When("selects {string} gender from the dropdown")
+    public void selects_gender_from_the_dropdown(String option) {
+        applicationFormPage.genderArrow.click();
+        applicationFormPage.selectOption(option);
     }
-    @When("selects {string} geschlecht from the dropdown")
-    public void selects_geschlecht_from_the_dropdown(String option) {
-        new ApplicationFormPage().geschlechtArrow.click();
-        new ApplicationFormPage().selectOption(option);
-    }
+
     @When("selects {string} location from the dropdown")
     public void selects_location_from_the_dropdown(String option) {
-        new ApplicationFormPage().locationArrow.click();
-        new ApplicationFormPage().selectOption(option);
+        applicationFormPage.locationArrow.click();
+        applicationFormPage.selectOption(option);
     }
+
     @When("selects {string} option from the dropdown menu")
     public void selects_option_from_the_dropdown_menu(String option) {
-        new ApplicationFormPage().whereDidYouHearUsFromArrow.click();
-        new ApplicationFormPage().selectOption(option);
+        applicationFormPage.whereDidYouHearUsFromArrow.click();
+        applicationFormPage.selectOption(option);
     }
+
     @When("chooses their {string} skills level {string}")
     public void chooses_their_skills_level(String language, String option) {
-        if(language.equalsIgnoreCase("german")){
-            new ApplicationFormPage().germanLevelArrow.click();
-        }else if(language.equalsIgnoreCase("english")){
-            new ApplicationFormPage().englishLevelArrow.click();
+        if (language.equalsIgnoreCase("german")) {
+            applicationFormPage.germanLevelArrow.click();
+        } else if (language.equalsIgnoreCase("english")) {
+            applicationFormPage.englishLevelArrow.click();
         }
-        new ApplicationFormPage().selectOption(option);
+        applicationFormPage.selectOption(option);
     }
+
     @When("uploads a {string}")
     public void uploads_a(String form) {
-        if(form.equalsIgnoreCase("CV")){
-            new ApplicationFormPage().uploadCv();
+        if (form.equalsIgnoreCase("CV")) {
+            applicationFormPage.uploadCv();
         }
     }
+
     @When("checks out the Datenschutz checkbox button")
     public void checks_out_the_Datenschutz_checkbox_button() {
-        BrowserUtils.scrollToElement(new ApplicationFormPage().datenschutzCheckBox);
-       new ApplicationFormPage().datenschutzCheckBox.click();
+        BrowserUtils.scrollToElement(new ApplicationFormPage().privacyCheckBox);
+        applicationFormPage.privacyCheckBox.click();
     }
+
     @When("clicks on the Submit button")
     public void clicks_on_the_Submit_button() {
-       Assert.assertTrue(new ApplicationFormPage().submitButton.isEnabled());
-      // new ApplicationFormPage().submitButton.click();
+        assertTrue(new ApplicationFormPage().submitButton.isEnabled());
+        // new ApplicationFormPage().submitButton.click();
     }
+
     @Then("the application should be completed successfully")
     public void the_application_should_be_completed_successfully() {
-        if (flag){
-            Assert.assertFalse(new ApplicationFormPage().formSubmittedMessage.isDisplayed());
-        }else{
-            Assert.assertTrue(new ApplicationFormPage().formSubmittedMessage.isDisplayed());
+        if (flag) {
+            assertFalse(new ApplicationFormPage().formSubmittedMessage.isDisplayed());
+        } else {
+            assertTrue(new ApplicationFormPage().formSubmittedMessage.isDisplayed());
         }
 
     }

@@ -1,14 +1,10 @@
 package de.maibornwolff.utilities;
 
-import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class BrowserUtils {
@@ -27,7 +23,6 @@ public class BrowserUtils {
         }
         Driver.get().switchTo().window(origin);
     }
-
     /**
      * Moves the mouse to given element
      *
@@ -37,7 +32,6 @@ public class BrowserUtils {
         Actions actions = new Actions(Driver.get());
         actions.moveToElement(element).perform();
     }
-
     /**
      * Performs a pause
      *
@@ -50,8 +44,6 @@ public class BrowserUtils {
             e.printStackTrace();
         }
     }
-
-
     /**
      * Waits for element matching the locator to be clickable
      *
@@ -63,7 +55,6 @@ public class BrowserUtils {
         WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
-
     /**
      * Scrolls down to an element using JavaScript
      *
@@ -72,6 +63,4 @@ public class BrowserUtils {
     public static void scrollToElement(WebElement element) {
         ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].scrollIntoView(true);", element);
     }
-
-
 }
